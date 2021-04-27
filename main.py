@@ -15,3 +15,9 @@ async def authenticate(request: Request, call_next) -> Response:
     request.state.auth = APIAutheticator(request)
 
     return await call_next(request)
+
+@app.get("/")
+async def ping(request: Request) -> dict:
+    """Ping the API. Returns a static response."""
+
+    return {"status": "ok"}
