@@ -1,3 +1,5 @@
+from asyncio import sleep
+
 from dotenv import load_dotenv
 from aiohttp import ClientSession
 from fastapi import FastAPI, Request, Response, WebSocket
@@ -53,4 +55,4 @@ async def ws_connect(ws: WebSocket) -> None:
 
     await wsm.connect(ws)
 
-    await wsm.close(4123)
+    await wsm.heartbeat()

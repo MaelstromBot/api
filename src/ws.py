@@ -1,4 +1,4 @@
-from asyncio import wait_for
+from asyncio import wait_for, sleep
 
 from fastapi import WebSocket
 
@@ -33,3 +33,23 @@ class WebSocketManager:
         })
 
         return await wait_for(self.connection.receive_json(), timeout=timeout)
+
+    async def get_guild_permission(self, guild: int, member: int, permission: str) -> bool:
+        try:
+            result = await self.expect({
+                "type": "guild_member_permissions",
+                "params": {
+                    "guild": guild,
+                    "member": member,
+                    "permission": permission
+                }
+            })
+
+            return result["value"]
+        except:
+            return False  # Fail secure
+
+    async def heartbeat(self):
+        while True:
+            await sleep(5)
+            await self.connection.send_json({"op": "heartbeat"})
