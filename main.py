@@ -3,6 +3,7 @@ from aiohttp import ClientSession
 from fastapi import FastAPI, Request, Response, WebSocket
 
 from src.database import Database
+from src.ws import WebSocketManager
 from src.auth import APIAutheticator
 
 
@@ -11,6 +12,7 @@ load_dotenv()
 app = FastAPI(docs_url=None)
 db = Database()
 session = ClientSession()
+wsm = WebSocketManager()
 
 @app.on_event("startup")
 async def startup() -> None:
@@ -20,9 +22,10 @@ async def startup() -> None:
 
 @app.middleware("http")
 async def attach(request: Request, call_next) -> Response:
-    """Attach the database and ClientSession to the request."""
+    """Attach the database, ws and ClientSession to the request."""
 
     request.state.db = db
+    request.state.ws = wsm
     request.state.session = session
 
     return await call_next(request)
@@ -48,4 +51,6 @@ async def ws_connect(ws: WebSocket) -> None:
     if not await APIAutheticator.validate_ws(ws):
         return
 
-    await ws.close()
+    await wsm.connect(ws)
+
+    await wsm.close(4123)
