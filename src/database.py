@@ -16,6 +16,9 @@ class Database:
             password=getenv("DB_PASS", "password"),
         )
 
+        with open("data/init.sql") as f:
+            await self.execute(f.read())
+
     async def execute(self, query: str, *args):
         async with self.pool.acquire() as conn:
             await conn.execute(query, *args)
