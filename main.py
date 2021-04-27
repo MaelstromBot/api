@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 from aiohttp import ClientSession
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, WebSocket
 
 from src.database import Database
 from src.auth import APIAutheticator
@@ -31,7 +31,7 @@ async def attach(request: Request, call_next) -> Response:
 async def authenticate(request: Request, call_next) -> Response:
     """Authenticate a backend API request."""
 
-    request.state.auth = APIAutheticator(request)
+    request.state.auth = APIAutheticator(request, db)
 
     return await call_next(request)
 
@@ -40,3 +40,12 @@ async def ping(request: Request) -> dict:
     """Ping the API. Returns a static response."""
 
     return {"status": "ok"}
+
+@app.websocket("/")
+async def ws_connect(ws: WebSocket) -> None:
+    """Connect to the websocket."""
+
+    if not await APIAutheticator.validate_ws(ws):
+        return
+
+    await ws.close()
