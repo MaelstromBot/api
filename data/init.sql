@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS GuildUsers (
     usr_id          BIGINT NOT NULL REFERENCES Users (id) ON DELETE CASCADE,
     guild_id        BIGINT NOT NULL REFERENCES Guilds (id) ON DELETE CASCADE,
     xp              BIGINT NOT NULL DEFAULT 0,
-    PRIMARY KEY (member_id, guild_id)
+    PRIMARY KEY (usr, guild_id)
 );
 
 CREATE TABLE IF NOT EXISTS OAuthSessions (
